@@ -61,11 +61,13 @@ class Net():
         for i, lay in enumerate(self.layers[1:-1]):
             for j, lu in enumerate(lay):
                 if self.verbose:
-                    print('training LUT at ({}, {})'.format(str(i+1), str(j)), end='\r')
+                    print('\r' + ' '*30, end='')
+                    print('\rtraining LUT at ({}, {})'.format(str(i+1), str(j)), end='')
                 lu.train(labels)
         self.layers[-1][0].eval()
-        if self.verbose: print(' '*30, end='\r')
-        print('training acc:', self.evalAcc(labels))
+        if self.verbose:
+            print('\r' + ' '*30, end='')
+            print('\rtraining acc:', self.evalAcc(labels))
         
     
     def validate(self, data, labels):
@@ -73,12 +75,13 @@ class Net():
         for i, lay in enumerate(self.layers[1:-1]):
             for j, lu in enumerate(lay):
                 if self.verbose:
-                    print('evaluating LUT at ({}, {})'.format(str(i+1), str(j)), end='\r')
-                    print(' '*30, end='\r')
+                    print('\r' + ' '*30, end='')
+                    print('\revaluating LUT at ({}, {})'.format(str(i+1), str(j)), end='')
                 lu.eval()
         self.layers[-1][0].eval()
-        if self.verbose: print(' '*30, end='\r')
-        print('validation acc:', self.evalAcc(labels))
+        if self.verbose:
+            print('\r' + ' '*30, end='')
+            print('\rvalidation acc:', self.evalAcc(labels))
         
     def evalAcc(self, labels):
         errs = np.abs(self.layers[-1][0].getVal() - labels).sum()

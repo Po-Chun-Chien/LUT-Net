@@ -55,6 +55,22 @@ class LUT(Node):
         inVals = np.array(inVals, dtype=np.int8).transpose()
         return inVals
         
+    def __setRandOut__(self, cnt, randId):
+        for i in randId:
+            x = 0
+            for j in range(self.k):
+                mask = 1 << j
+                n = i ^ mask
+                if cnt.flat[n] > 0:
+                    x += 1
+                elif cnt.flat[n] < 0:
+                    x -= 1
+            if x > 0:
+                self[i] = 1
+            elif x < 0:
+                self[i] = 0
+                
+                
     
     def train(self, labels):
         cnt = np.zeros(self.arr.shape, dtype=np.int32)
@@ -65,11 +81,15 @@ class LUT(Node):
             if lab == 1: cnt[inVal] += 1
             elif lab == 0: cnt[inVal] -= 1
             else: assert False
+        randId = []
         for i in range(2**self.k):
             if cnt.flat[i] > 0:
                 self[i] = 1
             elif cnt.flat[i] < 0:
-                self[i] = 0      
+                self[i] = 0
+            else:
+                randId.append(i)
+        self.__setRandOut__(cnt, randId)
         self.eval()
         
     def eval(self):
