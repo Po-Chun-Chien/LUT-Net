@@ -89,7 +89,7 @@ class LUT(Node):
                 self[i] = 0
             else:
                 randId.append(i)
-        self.__setRandOut__(cnt, randId)
+        #self.__setRandOut__(cnt, randId)
         self.eval()
         
     def eval(self):

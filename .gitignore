@@ -1,5 +1,8 @@
 # user-defined
 test*
+*.blif
+logs/
+exp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

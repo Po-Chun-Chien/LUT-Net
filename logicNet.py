@@ -1,8 +1,10 @@
+import os
+import pickle as pk
 import numpy as np
 from argparse import ArgumentParser
 from net import Net
-import pickle as pk
-import os
+from utils import readPLA
+
 
 def getArgs():
     parser = ArgumentParser()
@@ -15,39 +17,9 @@ def getArgs():
     parser.add_argument('-sm', '--save_model', type=str, default=None)
     parser.add_argument('-lm', '--load_model', type=str, default=None)
     parser.add_argument('-db', '--dump_blif', type=str, default=None)
-    args = parser.parse_args()
-    
+    args = parser.parse_args()    
     return args
     
-    
-def readPLA(fn):
-    if not os.path.isfile(fn):
-        print('Warning: PLA "{}" not found.'.format(fn))
-        return (None,) * 3
-    getNum = lambda s, head: int(s.strip('\n').replace(head, '').replace(' ', ''))
-    getPat = lambda s: s.strip('\n').replace(' ', '')
-    getArr = lambda x: np.array(x, dtype=np.int8)
-    with open(fn) as fp:
-        ni = getNum(fp.readline(), '.i')
-        no = getNum(fp.readline(), '.o')
-        nl = getNum(fp.readline(), '.p')
-        for line in fp:
-            if line.startswith('.type fr'):
-                break
-        
-        assert no == 1
-        data, labels = [], []
-        for i in range(nl):
-            pat = getPat(fp.readline())
-            assert(len(pat) == ni + no)
-            data.append(getArr([b for b in pat[:-1]]))
-            labels.append(pat[-1])
-        
-        for line in fp:
-            if line.startswith('.e'):
-                break
-                
-    return ni, getArr(data).transpose(), getArr(labels)
     
 def getLays(s):
     s = s.strip(',').split(',')
