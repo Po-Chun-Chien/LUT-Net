@@ -14,6 +14,7 @@ def getArgs():
     parser.add_argument('-hl', '--hidden_layers', type=str, default='1024,1024,1024')
     parser.add_argument('-rs', '--random_seed', type=int, default=None)
     parser.add_argument('-vb', '--verbose', action='store_true')
+    #parser.add_argument('-mi', '--verbose', action='store_true')
     parser.add_argument('-sm', '--save_model', type=str, default=None)
     parser.add_argument('-lm', '--load_model', type=str, default=None)
     parser.add_argument('-db', '--dump_blif', type=str, default=None)

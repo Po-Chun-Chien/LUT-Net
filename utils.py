@@ -56,4 +56,5 @@ def getMI(x, y):
             #print(xc, yc, xyCnt[(i, j)])
             #print(xProb, yProb, xyProb)
             mi += xyProb * math.log(xyProb / (xProb * yProb))
+    assert mi >= 0
     return mi

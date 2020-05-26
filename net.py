@@ -1,14 +1,14 @@
 import numpy as np
 from lut import Node, LUT
 
-def randChoice(n, m):
+def randChoice(n, m, p=None):
     # randomly choose n integers from 0, 1, ..., m-1
     if n < m:
-        return np.random.choice(m, n, replace=False)
+        return np.random.choice(m, n, False, p)
     q = n // m
     r = n % m
     ret = [np.arange(m) for _ in range(q)]
-    ret.append(np.random.choice(m, r, replace=False))
+    ret.append(np.random.choice(m, r, False, p))
     return np.concatenate(ret)
     
 
@@ -24,10 +24,11 @@ class Net():
         assert len(shp) >= 2
         np.random.seed(randSeed)
         self.shp = shp
-        self.__build__(k)
+        self.k = k
+        self.__build__()
         self.verbose = verbose
         
-    def __build__(self, k):
+    def __build__(self):
         self.layers = []
         for i, n in enumerate(self.shp):
             lay = []
@@ -42,8 +43,8 @@ class Net():
                         nd = Node('out', idx)
                         fis = randChoice(1, m)
                     else:  # hidden layer
-                        nd = LUT(idx, k)
-                        fis = randChoice(k, m)
+                        nd = LUT(idx, self.k)
+                        fis = randChoice(self.k, m)
                     for fi in fis:
                         nd.connect(self.layers[-1][fi])
                 lay.append(nd)
@@ -55,10 +56,25 @@ class Net():
         assert len(data) == self.shp[0]
         for i in range(self.shp[0]):
             self.layers[0][i].setVal(data[i])
+            
+    def __reconnect__(self, layId, labels):
+        if layId == 0: return
+        mis = np.array([nd.getMI(labels) for nd in self.layers[layId-1]]) ** 2
+        mis = mis / mis.sum()
+        m = len(self.layers[layId-1])
+        for nd in self.layers[layId]:
+            nd.disconnectAll()
+            if layId == len(self.layers) - 1:
+                fis = randChoice(1, m, mis)
+            else:
+                fis = randChoice(self.k, m, mis)
+            for fi in fis:
+                nd.connect(self.layers[layId-1][fi])
     
-    def train(self, data, labels):
+    def train(self, data, labels, useMI=True):
         self.__setInput__(data)
         for i, lay in enumerate(self.layers[1:-1]):
+            if useMI: self.__reconnect__(i, labels)
             for j, lu in enumerate(lay):
                 if self.verbose:
                     print('\r' + ' '*30, end='')

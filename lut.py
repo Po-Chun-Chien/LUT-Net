@@ -1,4 +1,5 @@
 import numpy as np
+from utils import getMI
 
 class Node():
     def __init__(self, nType, idx):
@@ -6,6 +7,9 @@ class Node():
         self.name = nType + str(idx[0]) + '_' + str(idx[1])
         self.idx = idx
         self.fis = []
+    
+    def disconnectAll(self):
+        self.fis.clear()
         
     def connect(self, fanin):
         self.fis.append(fanin)
@@ -22,6 +26,10 @@ class Node():
         
     def getName(self):
         return self.name
+        
+    def getMI(self, labels):
+        assert self.val is not None
+        return getMI(self.val, labels)
         
 
 class LUT(Node):
@@ -69,8 +77,6 @@ class LUT(Node):
                 self[i] = 1
             elif x < 0:
                 self[i] = 0
-                
-                
     
     def train(self, labels):
         cnt = np.zeros(self.arr.shape, dtype=np.int32)
@@ -78,9 +84,10 @@ class LUT(Node):
         assert len(inVals) == len(labels)
         for inVal, lab in zip(inVals, labels):
             inVal = tuple(inVal)
-            if lab == 1: cnt[inVal] += 1
-            elif lab == 0: cnt[inVal] -= 1
-            else: assert False
+            cnt[inVal] += lab * 2 - 1
+            #if lab == 1: cnt[inVal] += 1
+            #elif lab == 0: cnt[inVal] -= 1
+            #else: assert False
         randId = []
         for i in range(2**self.k):
             if cnt.flat[i] > 0:
@@ -89,7 +96,7 @@ class LUT(Node):
                 self[i] = 0
             else:
                 randId.append(i)
-        #self.__setRandOut__(cnt, randId)
+        self.__setRandOut__(cnt, randId)
         self.eval()
         
     def eval(self):
@@ -104,3 +111,4 @@ class LUT(Node):
             if self[i] == 1:
                 pats.append(format(i, fmt) + ' 1')
         return names, pats
+        
