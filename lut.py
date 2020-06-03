@@ -151,3 +151,14 @@ class LUT(Node):
                 pats.append(format(i, fmt) + ' 1')
         return names, pats
         
+    # trains the LUT to mimic a neuron according to the input weights
+    def trainFromNN(self, W):
+        assert len(W) == self.k
+        sigmoid = lambda x: 1 / (1 + np.exp(-x))
+        toBin = lambda x: np.array(list(np.binary_repr(x, self.k)), dtype=np.int8)
+        for i in range(2**self.k):
+            x = toBin(i)
+            y = sigmoid(np.dot(x, W))
+            self[i] = int(round(y))
+            
+        
