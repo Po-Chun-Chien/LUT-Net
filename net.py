@@ -135,3 +135,8 @@ class Net():
         fp.write('.end')
         fp.close()
         
+    # TODO: 
+    # 1. reconnects all the LUTs according to the given NN connections
+    # 2. train each LUT
+    def trainFromNN(self):
+        pass
