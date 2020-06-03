@@ -3,30 +3,49 @@ from utils import getMI
 
 class Node():
     def __init__(self, nType, idx):
+    ######################################################################################
+    ##  description:                                                                    ##
+    ##      the base class of the basic nodes (in/out-put) in LogicNet                  ##
+    ##  parameters:                                                                     ##
+    ##      nType:  node type (in/out/lut), also serves as the prefix of the node name  ##
+    ##      idx:    index of the node in the net (2-tuple)                              ##
+    ##  members:                                                                        ##
+    ##      val:    a numpy array of 0/1 values of the node after inference             ##
+    ##      name:   the node name                                                       ##
+    ##      idx:    index of the node in the net (2-tuple)                              ##
+    ##      fis:    a list of fanin nodes                                               ##
+    ######################################################################################
         self.val = None
         self.name = nType + str(idx[0]) + '_' + str(idx[1])
         self.idx = idx
         self.fis = []
     
+    # clears all fanins
     def disconnectAll(self):
         self.fis.clear()
-        
+      
+    # adds a node to the fanin list
     def connect(self, fanin):
         self.fis.append(fanin)
         
+    # sets the values of the 'input' node in a net 
     def setVal(self, data):
         self.val = data
-        
+     
+    # returns the values of the node
     def getVal(self):
         return self.val
-        
+    
+    # retrieves and sets the values of the an 'output' node from its single fanin node
     def eval(self):
         assert len(self.fis) == 1
         self.val = self.fis[0].getVal()
         
+    # returns the node name
     def getName(self):
         return self.name
-        
+    
+    # returns the mutual information between the correct labels and the node's values
     def getMI(self, labels):
         assert self.val is not None
         return getMI(self.val, labels)
@@ -34,11 +53,25 @@ class Node():
 
 class LUT(Node):
     def __init__(self, idx, k=6):
+    ######################################################################################
+    ##  description:                                                                    ##
+    ##      the class of the look-up-tables in LogicNet, inheritance of the "Node"      ##
+    ##  parameters:                                                                     ##
+    ##      idx:    index of the node in the net (2-tuple)                              ##
+    ##      k:      number of inputs of the LUT                                         ##
+    ##  members:                                                                        ##
+    ##      k:      number of inputs of the LUT                                         ##
+    ##      arr:    the numpy array the stores the function of the LUT                  ##
+    ######################################################################################
         super().__init__('lut', idx)
         self.k = k
         shp = (2,) * k
         self.arr = (np.random.rand(*shp) < 0.5).astype(np.int8)
-        
+    
+    # the magic method __getitem__ for LUT
+    # for a lut object n, and a binary k-tuple X=(x_1, ..., x_k), the method returns n(X)
+    # usage: (2 types of indexing supported)
+    #   1. u[X] (with tuple)  2. u[x_1*2^(k-1) + ... + x_k] (with int)
     def __getitem__(self, key):
         if type(key) == int:
             return self.arr.flat[key]
@@ -47,7 +80,11 @@ class LUT(Node):
         else:
             print('Illegal indexing!!')
             assert False
-        
+    
+    # the magic method __setitem__ for LUT
+    # the method set n(X) to the given binary value v
+    # usage: (2 types of indexing supported)
+    #   1. u[X] = v  2. u[x_1*2^(k-1) + ... + x_k] = v
     def __setitem__(self, key, value):
         if type(key) == int:
             self.arr.flat[key] = value
@@ -56,7 +93,6 @@ class LUT(Node):
         else:
             print('Illegal indexing!!')
             assert False
-            
             
     def __prepInVal__(self):
         inVals = [nd.getVal() for nd in self.fis]
@@ -78,6 +114,7 @@ class LUT(Node):
             elif x < 0:
                 self[i] = 0
     
+    # trains the LUT to fit the labels
     def train(self, labels):
         cnt = np.zeros(self.arr.shape, dtype=np.int32)
         inVals = self.__prepInVal__()
@@ -98,11 +135,13 @@ class LUT(Node):
                 randId.append(i)
         self.__setRandOut__(cnt, randId)
         self.eval()
-        
+    
+    # evalutes the values of the LUT during inference
     def eval(self):
         inVals = self.__prepInVal__()
         self.val = np.array([self[tuple(inVal)] for inVal in inVals], dtype=np.int8)
-        
+    
+    # converts the information of the LUT to strings
     def toStrings(self):
         names = [fi.getName() for fi in self.fis] + [self.name]
         pats = []
