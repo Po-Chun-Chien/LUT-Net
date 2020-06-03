@@ -67,6 +67,7 @@ class Net():
             for fi in fis:
                 nd.connect(self.layers[layId-1][fi])
     
+    # trains the net with the given data and labels
     def train(self, data, labels, useMI=False):
         self.__setInput__(data)
         for i, lay in enumerate(self.layers[1:-1]):
@@ -81,8 +82,8 @@ class Net():
             print('\r' + ' '*30, end='')
             print('\rtraining acc:', self.evalAcc(labels))
         
-    
-    def validate(self, data, labels):
+    # performs inference on the given data
+    def validate(self, data, labels=None):
         self.__setInput__(data)
         for i, lay in enumerate(self.layers[1:-1]):
             for j, lu in enumerate(lay):
@@ -91,10 +92,11 @@ class Net():
                     print('\revaluating LUT at ({}, {})'.format(str(i+1), str(j)), end='')
                 lu.eval()
         self.layers[-1][0].eval()
-        if self.verbose:
+        if self.verbose and labels:
             print('\r' + ' '*30, end='')
             print('\rvalidation acc:', self.evalAcc(labels))
-            
+    
+    # evaluates the accuracy after inference
     def evalAcc(self, labels):
         errs = np.abs(self.layers[-1][0].getVal() - labels).sum()
         return (len(labels) - errs) / len(labels)
@@ -106,7 +108,8 @@ class Net():
         assert i < len(self.layers[0])
         self.fiNet[i] = fiNet
         self.layers[0][i].connect(fiNet.getOutputNode())
-        
+    
+    # dumps the net into a combinational circui in BLIF format
     def dumpBlif(self, fn):
         fp = open(fn, 'w')
         fp.write('.model {}\n'.format(self.name))
