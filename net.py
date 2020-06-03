@@ -1,24 +1,17 @@
 import numpy as np
 from lut import Node, LUT
-
-def randChoice(n, m, p=None):
-    # randomly choose n integers from 0, 1, ..., m-1
-    if n < m:
-        return np.random.choice(m, n, False, p)
-    q = n // m
-    r = n % m
-    ret = [np.arange(m) for _ in range(q)]
-    ret.append(np.random.choice(m, r, False, p))
-    return np.concatenate(ret)
-    
+from utils import randChoice    
 
 class Net():
-    def __init__(self, shp, k=6, randSeed=None, verbose=False):
+    def __init__(self, shp, k=6, prefix='LogicNet', idx=(0,0), randSeed=None, verbose=False):
     #################################################################################
     ##  parameters:                                                                ##
     ##      shp:        network shape (input_size, hidden_size..., output_size=1)  ##
     ##      k:          #input of LUTs                                             ##
+    ##      prefix:     prefix of the net name                                     ##
+    ##      idx:        index of the net (2-tuple)                                 ##
     ##      randSeed:   random seed                                                ##
+    ##      versbose:   toggles verbosity during training/inference                ##
     #################################################################################
         
         assert len(shp) >= 2
@@ -26,7 +19,10 @@ class Net():
         self.shp = shp
         self.k = k
         self.__build__()
+        self.name = prefix + str(idx[0]) + '_' + str(idx[1])
+        self.idx = idx
         self.verbose = verbose
+        self.fiNets = [None] * shp[0]
         
     def __build__(self):
         self.layers = []
@@ -59,8 +55,8 @@ class Net():
             
     def __reconnect__(self, layId, labels):
         if layId == 0: return
-        mis = np.array([nd.getMI(labels) for nd in self.layers[layId-1]]) ** 2
-        mis = mis / mis.sum()
+        mis = np.array([nd.getMI(labels) for nd in self.layers[layId-1]])
+        mis = None if (mis.sum() == 0) else (mis / mis.sum())
         m = len(self.layers[layId-1])
         for nd in self.layers[layId]:
             nd.disconnectAll()
@@ -71,7 +67,7 @@ class Net():
             for fi in fis:
                 nd.connect(self.layers[layId-1][fi])
     
-    def train(self, data, labels, useMI=True):
+    def train(self, data, labels, useMI=False):
         self.__setInput__(data)
         for i, lay in enumerate(self.layers[1:-1]):
             if useMI: self.__reconnect__(i, labels)
@@ -98,14 +94,22 @@ class Net():
         if self.verbose:
             print('\r' + ' '*30, end='')
             print('\rvalidation acc:', self.evalAcc(labels))
-        
+            
     def evalAcc(self, labels):
         errs = np.abs(self.layers[-1][0].getVal() - labels).sum()
         return (len(labels) - errs) / len(labels)
         
+    def getOutputNode(self):
+        return self.layers[-1][0]
+        
+    def connect(self, i, fiNet):
+        assert i < len(self.layers[0])
+        self.fiNet[i] = fiNet
+        self.layers[0][i].connect(fiNet.getOutputNode())
+        
     def dumpBlif(self, fn):
         fp = open(fn, 'w')
-        fp.write('.model LogicNet\n')
+        fp.write('.model {}\n'.format(self.name))
         fp.write('.inputs')
         for i in self.layers[0]:
             fp.write(' ' + i.getName())

@@ -14,7 +14,6 @@ def getArgs():
     parser.add_argument('-hl', '--hidden_layers', type=str, default='1024,1024,1024')
     parser.add_argument('-rs', '--random_seed', type=int, default=None)
     parser.add_argument('-vb', '--verbose', action='store_true')
-    #parser.add_argument('-mi', '--verbose', action='store_true')
     parser.add_argument('-sm', '--save_model', type=str, default=None)
     parser.add_argument('-lm', '--load_model', type=str, default=None)
     parser.add_argument('-db', '--dump_blif', type=str, default=None)
@@ -38,7 +37,7 @@ if __name__ == '__main__':
         assert ni1 or ni2
         lays = tuple([ni1 if ni1 else ni2] + getLays(args.hidden_layers) + [1])
         k, rs, vb = args.lut_k, args.random_seed, args.verbose
-        nn = Net(lays, k, rs, vb)
+        nn = Net(lays, k=k, randSeed=rs, verbose=vb)
     
     if trnData is not None: nn.train(trnData, trnLabels)
     if valData is not None: nn.validate(valData, valLabels)
