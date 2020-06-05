@@ -3,7 +3,7 @@ from lut import Node, LUT
 from utils import randChoice    
 
 class Net():
-    def __init__(self, shp, k=6, prefix='LogicNet', idx=(0,0), randSeed=None, verbose=False):
+    def __init__(self, shp, k=6, prefix='LogicNet', model=None, idx=(0,0), randSeed=None, verbose=False):
     #################################################################################
     ##  parameters:                                                                ##
     ##      shp:        network shape (input_size, hidden_size..., output_size=1)  ##
@@ -18,7 +18,11 @@ class Net():
         np.random.seed(randSeed)
         self.shp = shp
         self.k = k
-        self.__build__()
+        self.model = model
+        if model != None:
+            self.__buildFromNN__()
+        else:
+            self.__build__()
         self.name = prefix + str(idx[0]) + '_' + str(idx[1])
         self.idx = idx
         self.verbose = verbose
@@ -46,7 +50,31 @@ class Net():
                 lay.append(nd)
             self.layers.append(lay)
                     
-    
+    def __buildFromNN__(self):
+        self.layers = []
+        fc_list = [self.model.fc1, self.model.fc2, self.model.fc3, self.model.fc4]
+        for i, n in enumerate(self.shp):
+            lay = []
+            for j in range(n):
+                idx = (i, j)
+                if i == 0:
+                    nd = Node('in', idx)
+                else:
+                    weight = fc_list[i-1].weight[j].detach().numpy()
+                    fis = np.nonzero(weight)[0]
+                    if i == len(self.shp) - 1:  # output layer
+                        nd = LUT('out', fis.shape[0])
+                    else:
+                        nd = LUT(idx, fis.shape[0])
+
+                    W = weight[fis]
+                    B = fc_list[i-1].bias[j].detach().item()
+                    for fi in fis:
+                        nd.connect(self.layers[-1][fi])
+                    nd.trainFromNN(W, B)
+                lay.append(nd)
+            self.layers.append(lay)
+
     def __setInput__(self, data):
         # set up input layer
         assert len(data) == self.shp[0]
@@ -68,7 +96,8 @@ class Net():
                 nd.connect(self.layers[layId-1][fi])
     
     # trains the net with the given data and labels
-    def train(self, data, labels, useMI=False):
+    def train(self, data, labels, useMI=False, model=None):
+        if self.model != None: return
         self.__setInput__(data)
         for i, lay in enumerate(self.layers[1:-1]):
             if useMI: self.__reconnect__(i, labels)
@@ -92,12 +121,13 @@ class Net():
                     print('\revaluating LUT at ({}, {})'.format(str(i+1), str(j)), end='')
                 lu.eval()
         self.layers[-1][0].eval()
-        if self.verbose and labels:
+        if self.verbose:
             print('\r' + ' '*30, end='')
             print('\rvalidation acc:', self.evalAcc(labels))
     
     # evaluates the accuracy after inference
     def evalAcc(self, labels):
+        print((self.layers[-1][0].getVal()))
         errs = np.abs(self.layers[-1][0].getVal() - labels).sum()
         return (len(labels) - errs) / len(labels)
         
