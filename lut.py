@@ -151,7 +151,7 @@ class LUT(Node):
                 pats.append(format(i, fmt) + ' 1')
         if len(pats) == 2**self.k: # const 1
             names, pats =  self.name, ['1']
-        elif len(pats) == 0:
+        elif len(pats) == 0: # const 0
             names = self.name
         return names, pats
         
