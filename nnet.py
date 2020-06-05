@@ -17,7 +17,7 @@ class NNet():
         self.nLay = nLay
         self.verbose = verbose
         self.__build__()
-        
+
     def __build__(self):
         self.netLays = []
         for i, n in enumerate(self.shp):
@@ -38,6 +38,6 @@ class NNet():
                         nt.connect(k, self.netLays[-1][fi])
                 netLay.append(nt)
             self.netLays.append(netLay)
-            
+
     def train(self, data, labels, soft=True, useLab=True):
         pass

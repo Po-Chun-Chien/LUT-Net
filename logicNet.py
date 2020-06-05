@@ -1,7 +1,9 @@
 import os
 import pickle as pk
 import numpy as np
+import torch
 from argparse import ArgumentParser
+from nn.Models import FC1 as model
 from net import Net
 from utils import readPLA
 
@@ -16,6 +18,7 @@ def getArgs():
     parser.add_argument('-vb', '--verbose', action='store_true')
     parser.add_argument('-sm', '--save_model', type=str, default=None)
     parser.add_argument('-lm', '--load_model', type=str, default=None)
+    parser.add_argument('-nm', '--nn_model', type=str, default=None)
     parser.add_argument('-db', '--dump_blif', type=str, default=None)
     args = parser.parse_args()    
     return args
@@ -33,6 +36,14 @@ if __name__ == '__main__':
     
     if args.load_model:
         nn = pk.load(open(args.load_model, 'rb'))
+    elif args.nn_model:
+        fc = model(ni1, activate='sigmoid', weight=10)
+        fc.load_state_dict(torch.load(args.nn_model))
+        assert(ni1 == fc.fc1.weight.shape[1])
+        lays = (fc.fc1.weight.shape[1], fc.fc2.weight.shape[1],
+                fc.fc3.weight.shape[1], fc.fc4.weight.shape[1], 1)
+        k, rs, vb = args.lut_k, args.random_seed, args.verbose
+        nn = Net(lays, k=k, randSeed=rs, verbose=vb, model=fc)
     else:
         assert ni1 or ni2
         lays = tuple([ni1 if ni1 else ni2] + getLays(args.hidden_layers) + [1])

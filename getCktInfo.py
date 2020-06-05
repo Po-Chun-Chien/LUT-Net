@@ -69,13 +69,15 @@ def ensemble(inBlifs, outBlif, opt=False, abcDir='.'):
     _ = abcProcess(abcCmd, abcDir)
     
 def test():
-    a,b,c = getCktInfo('/home/b04112/Documents/LogicNet/test.blif', '/home/b04112/Documents/LogicNet/test2.blif', '/home/b04112/Documents/abc2/')
+    a,b,c = getCktInfo('/home/whz861025/workplace/Logic_NeuralNet/LogicNet/test.blif', '/home/whz861025/workplace/Logic_NeuralNet/LogicNet/test_out.blif',
+            '/home/whz861025/abc/')
     print('#PI:', a)
     print('#PO:', b)
     print('#gate:', c)
     
 def test2():
-    acc =  getAcc('/home/b04112/Documents/IWLSContest2020/XGBDTs/test0.blif', '/home/b04112/Documents/abc2/IWLS2020/testcases/ex00.valid.pla', '/home/b04112/Documents/abc2/')
+    acc =  getAcc('/home/whz861025/workplace/Logic_NeuralNet/LogicNet/test.blif', '/home/whz861025/workplace/Logic_NeuralNet/iwls_competition_0323/ex00.valid.pla',
+            '/home/whz861025/abc/')
     print('acc:', acc)
     
 def test3():
@@ -84,6 +86,6 @@ def test3():
     
     
 if __name__ == '__main__':
-    test()
-    #test2()
-    test3()
+    # test()
+    test2()
+    # test3()
