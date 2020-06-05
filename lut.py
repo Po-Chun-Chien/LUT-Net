@@ -149,6 +149,10 @@ class LUT(Node):
         for i in range(2**self.k):
             if self[i] == 1:
                 pats.append(format(i, fmt) + ' 1')
+        if len(pats) == 2**self.k: # const 1
+            names, pats =  self.name, ['1']
+        elif len(pats) == 0:
+            names = self.name
         return names, pats
         
     # trains the LUT to mimic a neuron according to the input weights
