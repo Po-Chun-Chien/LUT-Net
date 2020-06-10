@@ -1,1 +1,0 @@
-../IWLSContest2020/getCktInfo.py
