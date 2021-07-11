@@ -1,5 +1,5 @@
 # LUT-Net
-An implementation of binary decision tree with fringe-features extraction.
+An implementation of LUT-Net (a network of look-up-tables) learning procedure described in [[1]](#ref1).
 
 ## Introduction
 This repository contains one of the methods we used in the [IWLS 2020](https://iwls20.cade.utah.edu/) Programming Contest.
@@ -22,11 +22,11 @@ python3 main.py --train_data benchmarks/train/ex00.train.pla --valid_data benchm
 ```
 
 ## References
-<a class="anchor" id="ref1">[1]</a> G. Pagallo and D. Haussler, “Boolean Feature Discovery in Empirical Learning,” Machine Learning, vol. 5, no. 1, p. 71–99, 1990.
+<a class="anchor" id="ref1">[1]</a> S. Chatterjee, “Learning and Memorization,” in Proceedings of the International Conference on Machine Learning (PMLR), pp. 755–763, 2018.
 
-<a class="anchor" id="ref2">[2]</a> A. L. Oliveira and A. Sangiovanni-Vincentelli, “Learning Complex Boolean Functions: Algorithms and Applications,” in Proceedings of the International Conference on Neural Information Processing Systems (NeurIPS), p. 911–918, 1993.
+<a class="anchor" id="ref2">[2]</a> S. Rai et al., "Logic Synthesis Meets Machine Learning: Trading Exactness for Generalization," in Proceedings of the Design, Automation and Test in Europe Conference (DATE), 2021.
 
-<a class="anchor" id="ref3">[3]</a> S. Rai et al., "Logic Synthesis Meets Machine Learning: Trading Exactness for Generalization," in Proceedings of the Design, Automation and Test in Europe Conference (DATE), 2021.
+<a class="anchor" id="ref3">[3]</a> S. Han, J. Pool, J. Tran, and W. J. Dally, “Learning both weights and connections for efficient neural networks,” in Proceedings of the International Conference on Neural Information Processing Systems (NeurIPS), p. 1135–1143, 2015.
 
 # Suggestions, Questions, Bugs, etc
 You are welcome to create an [issue](https://github.com/Po-Chun-Chien/LUT-Net/issues) to make suggestions, ask questions, or report bugs, etc.
