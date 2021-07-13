@@ -20,7 +20,25 @@ To save the learned binary decision tree model, you can write it into a pickle f
 Below is an example to run our program.
 You can use the `--help` flag to see a more detailed usage.
 ```
-python3 lutNet.py --train_data benchmarks/train/ex00.train.pla --valid_data benchmarks/validation/ex00.valid.pla --lut_k 6 --hidden_layers 1000,500,100 --save_model ex00_model.pk --dump_blif ex00_model.blif
+python3 lutNet.py --train_data benchmarks/train/ex00.train.pla --valid_data benchmarks/validation/ex00.valid.pla --lut_k 6 --hidden_layers 1000,500,100 --save_model ex00_model.pk --dump_blif ex00_model.blif --verbose
+```
+
+### Conversion from a Pre-trained Sparse Neural Network
+The LUT-Net we used in the contest were all converted from a pre-trained sparse neural network (NN).
+Each neuron in the NN is converted into a LUT by enumerating all the possible input assignments and rounding/quantizing its activation (to 0/1).
+Here we listed some guidelines for NN model training and conversion.
+* The activation function of each neuron should be sigmoid function, which restricts the output to a value between 0 and 1. 
+* The NN is expected to be sparse (not fully connected), since an enumeration step (exponential complexity) is required during the conversion. In practice, we apply the connection pruning technique proposed in [[3]](#ref3) so that the number of inputs of each neuron is at a reasonable quantity.
+
+After conversion, the number of inputs of each LUT is the same as the number of inputs of each neuron.
+Inevitably, there is also a minor accuracy degradation caused by the rounding errors of the sigmoid activations.
+(This can be possibly solved by adding a loss function that favors the binarization of neuron outputs to during NN training.)
+
+Unfortunately, an easy-to-use interface is currently not supported.
+You may need to trace the source code and integrate your model into the flow yourself.
+Below is an example to run our program.
+```
+python3 lutNet.py --train_data benchmarks/train/ex00.train.pla --valid_data benchmarks/validation/ex00.valid.pla --nn_model nn/pruned10_12_model/ex00_best.pth.tar --save_model ex00_model.pk --dump_blif ex00_model.blif --verbose
 ```
 
 ## References
