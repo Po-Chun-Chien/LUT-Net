@@ -42,11 +42,11 @@ python3 lutNet.py --train_data benchmarks/train/ex00.train.pla --valid_data benc
 ```
 
 ## References
-<a class="anchor" id="ref1">[1]</a> S. Chatterjee, “Learning and Memorization,” in Proceedings of the International Conference on Machine Learning (PMLR), pp. 755–763, 2018.
+<a class="anchor" id="ref1">[1]</a> S. Chatterjee, “Learning and Memorization,” in Proc. Machine Learning Research (PMLR), pp. 755–763, 2018.
 
-<a class="anchor" id="ref2">[2]</a> S. Rai et al., "Logic Synthesis Meets Machine Learning: Trading Exactness for Generalization," in Proceedings of the Design, Automation and Test in Europe Conference (DATE), 2021.
+<a class="anchor" id="ref2">[2]</a> S. Rai et al., "Logic Synthesis Meets Machine Learning: Trading Exactness for Generalization," in Proc. DATE, 2021.
 
-<a class="anchor" id="ref3">[3]</a> S. Han, J. Pool, J. Tran, and W. J. Dally, “Learning both weights and connections for efficient neural networks,” in Proceedings of the International Conference on Neural Information Processing Systems (NeurIPS), p. 1135–1143, 2015.
+<a class="anchor" id="ref3">[3]</a> S. Han, J. Pool, J. Tran, and W. J. Dally, “Learning both weights and connections for efficient neural networks,” in Proc. NeurIPS, p. 1135–1143, 2015.
 
 # Suggestions, Questions, Bugs, etc
 You are welcome to create an [issue](https://github.com/Po-Chun-Chien/LUT-Net/issues) to make suggestions, ask questions, or report bugs, etc.
